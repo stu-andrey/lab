@@ -8,21 +8,24 @@ from ..config.db import get_db
 
 from ..models import Works as WorksModel
 
-from ..schemas import BaseWork, Work
+from ..schemas import BaseWork, Work, WorkPreview
 
 from sqlalchemy.orm import Session
+from sqlalchemy import select, insert
 
 from typing import List
-
 
 router = APIRouter(
     prefix="/api/works",
     tags=["Works"]
 )
 
-@router.get("/", response_description="List of all works", response_model=List[Work], status_code=status.HTTP_200_OK)
+@router.get("/", response_description="List of all works", response_model=List[WorkPreview], status_code=status.HTTP_200_OK)
 def get_all_works(db: Session=Depends(get_db)):
-    works = db.query(WorksModel).all()
+
+    stmt = select(WorksModel.id, WorksModel.image)
+    # print(stmt)
+    works = db.execute(stmt).fetchall()
 
     if works == []:
         raise HTTPException(
@@ -33,9 +36,11 @@ def get_all_works(db: Session=Depends(get_db)):
     return works
 
 
-@router.get("/id/", response_description="Get work by id", response_model=Work, status_code=status.HTTP_200_OK)
+@router.get("/id/{id}", response_description="Get work by id", response_model=Work, status_code=status.HTTP_200_OK)
 def get_work_by_id(id: int, db: Session=Depends(get_db)):
-    work = db.query(WorksModel).filter(WorksModel.id == id).first()
+
+    stmt = select(WorksModel).where(WorksModel.id == id).limit(1)
+    work = db.execute(stmt).scalar()
 
     if work is None:
         raise HTTPException(
@@ -48,10 +53,20 @@ def get_work_by_id(id: int, db: Session=Depends(get_db)):
 
 @router.post("/", response_description="Create new work", response_model=Work, status_code=status.HTTP_201_CREATED)
 def create_work(work: BaseWork, db: Session=Depends(get_db)):
-    new_work = WorksModel(**work.model_dump())
 
-    db.add(new_work)
-    db.commit()
-    db.refresh(new_work)
+    try:
+        new_work = db.execute(
+            insert(WorksModel).returning(WorksModel), 
+            [{**work.model_dump()}]
+        ).scalar()
 
-    return new_work
+    except:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Не удалось добавить новую работу"
+        )
+    
+    else:
+        db.commit()
+        return new_work

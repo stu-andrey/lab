@@ -12,3 +12,7 @@ class BaseWork(BaseModel):
 
 class Work(BaseWork):
     id: int
+
+class WorkPreview(BaseModel):
+    id: int
+    image: str

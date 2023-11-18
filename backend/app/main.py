@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 # Нужен для разворачивания БД, 
 # т.к. в нем хранится информация 
@@ -16,6 +18,21 @@ app = FastAPI(
     title = "College Portfolio API",
     docs_url = "/documentation",
     redoc_url = None
+)
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Создаем в базе данных таблицы по моделям.

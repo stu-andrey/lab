@@ -1,0 +1,10 @@
+.card {
+    width: 100%;
+}
+
+.image {
+    width: 100%;
+     display: block; /* Чтобы не было отступа снизу */
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+}
