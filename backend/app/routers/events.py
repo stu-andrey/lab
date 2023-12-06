@@ -4,11 +4,11 @@ from fastapi import (
     status, 
     Depends)
 
-from ..config import get_db
+from config.db import get_db
 
-from ..models import Events as EventsModel
+from models import Events as EventsModel
 
-from ..schemas import BaseEvent, Event, EventPreview
+from schemas import BaseEvent, Event, EventPreview
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert

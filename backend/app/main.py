@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config.db import Base 
+from config.db import Base 
 
-from .config.db import engine
+from config.db import engine
 
-from .routers import events
+from routers import events
 
 
 app = FastAPI(
@@ -15,16 +15,9 @@ app = FastAPI(
     redoc_url = None
 )
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-origins = [
-    "http://localhost",
-    "http://localhost:3000"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    #allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
