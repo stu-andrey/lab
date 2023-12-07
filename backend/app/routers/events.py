@@ -50,8 +50,8 @@ def get_event_by_id(id: int, db: Session=Depends(get_db)):
 @router.get("/type/{type}", response_description="Get events by type", response_model=List[EventPreview], status_code=status.HTTP_200_OK)
 def get_events_by_type(type: str, db: Session=Depends(get_db)):
 
-    stmt = select(EventsModel).where(EventsModel.type == type)
-    events = db.execte(stmt).fetchall()
+    stmt = select(EventsModel.id).where(EventsModel.category == type)
+    events = db.execute(stmt).fetchall()
 
     if events == []:
         raise HTTPException(
