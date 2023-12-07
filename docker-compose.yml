@@ -6,7 +6,6 @@ services:
     image: postgres:latest
     restart: always
     container_name: postgres_container
-    command: -p 5432
     volumes:
       - ./docker/pg-data:/var/lib/postgresql/data/
     env_file:
